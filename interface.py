@@ -23,14 +23,20 @@ class Application(object):
 
     def widgets_message_panel(self):
         entry_template = Text(self.message_panel, width=60, height=7)
-        entry_template.place(x=50, y=20)
-        scroll = Scrollbar(command=entry_template.yview)
-        scroll.place(x=540, y=50)
+        entry_template.place(x=50, y=60)
+        scroll = Scrollbar(self.message_panel, command=entry_template.yview)
+        scroll.place(x=540, y=90)
         entry_template.config(yscrollcommand=scroll.set)
-        add_message_butn = Button(self.message_panel, text='Добавить шаблон', font='Times 12 bold').place(x=80,y=140)
+        add_message_butn = Button(self.message_panel, text='Добавить шаблон', font='Times 12 bold').place(x=80,y=180)
         self.templates_listbox = Listbox(self.message_panel, height=15, width=60, selectmode=MULTIPLE)
-        self.templates_listbox.place(x=400, y=140)
-
+        self.templates_listbox.place(x=400, y=180)
+        self.result_template = Text(self.message_panel, width=60, height=7)
+        self.result_template.place(x=50, y=60)
+        self.lbl_amount_vars = Label(self.message_panel, text='Колличество', font='arial 15 bold')
+        self.lbl_amount_vars.place(x=380, y=450)
+        self.amount_vars= StringVar(self.master,'10')
+        self.variants_amount = Spinbox(self.message_panel, from_=0,to=1000,wrap=True,textvariable=self.amount_vars,width=4)
+        self.variants_amount.place(x=500, y=450)
 
 
 def main():
