@@ -49,14 +49,14 @@ def test():
         ['2107miker@gmail.com', '2107miker'],
     ]
     for i in range(2):
-        for j in range(2):
-            driver.get('https://prime.date/auth')
-            time.sleep(3)
+        # for j in range(2):
+        driver.get('https://prime.date/auth')
+        #     time.sleep(3)
             driver.find_element_by_xpath("/html/body/div[1]/div[4]/div/form/div[2]/input").send_keys(accounts[i][0])
             driver.find_element_by_xpath("/html/body/div[1]/div[4]/div/form/div[3]/input").send_keys(accounts[i][1])
             driver.find_element_by_xpath('/html/body/div[1]/div[4]/div/form/button').click()
 
-        driver.find_element_by_tag_name('body').send_keys(Keys.COMMAND + 't')
+        driver.find_element_by_tag_name('html').send_keys(Keys.CONTROL + 't')
 
     # driver.close()
 test()
