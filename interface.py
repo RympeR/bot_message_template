@@ -134,7 +134,7 @@ def main():
     root = Tk()
     app = Application(root)
     root.title("Child center")
-    root.geometry("1100x800")
+    root.geometry("1100x900")
 
     root.mainloop()
 

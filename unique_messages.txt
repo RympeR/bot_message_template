@@ -1,0 +1,35 @@
+c + c1
+a + c1
+a + b1
+c + a1
+b + a1
+a1 - b2
+c1 - b2
+a1 - a2
+b1 - c2
+c1 - a2
+b1 - b2
+b1 - a2
+c1 - c2
+a1 - c2
+a-a2
+a-c2
+b-b2
+c-a2
+b-a2
+c1 + c2 + c - c
+a1 + b2 + b - b
+a1 + c2 + c - c
+c1 + a2 + a - a
+b1 + a2 + a - a
+a1 + c2 + a - a
+b1 + c2 + b - b
+b1 + b2 + a - a
+b1 + b2 + b - b
+a1 + a2 + b - b
+c1 + c2 + a - a
+a1 + a2 + a - a
+a1 + c2 + b - b
+c1 + b2 + c - c
+b1 + a2 + c - c
+b1 + c2 + a - a
