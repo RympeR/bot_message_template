@@ -4,8 +4,11 @@ from template_logic import *
 from bot_logic import *
 import json
 
+MESSAGES = {}
+
 class Application(object):
     def __init__(self, master):
+
         self.master = master
         self.message_template = StringVar()
         self.main_window()
@@ -19,9 +22,31 @@ class Application(object):
         self.tabs.add(self.message_panel, text="Message panel")
         self.widgets_message_panel()
         self.display_templates()
+        self.widgets_bot_panel()
 
-    def widgets_bot_panel(self):
-        pass
+    def widgets_bot_panel(self, profile_id=None):
+        #рассылка
+        self.lbl_message = Label(self.bot_panel, text='Рассылка', font='arial 15 bold')
+        self.lbl_message.grid(row=0, column=0, pady=10)
+        self.entry_message = Entry(self.bot_panel, width=30, bd=4)
+        self.entry_message.grid(row=0, column=1, padx=10, pady=10)
+
+        #анкета
+        self.lbl_profile = Label(self.bot_panel, text=f'Текущий профиль {profile_id}',
+            font='arial 15 bold')
+        self.lbl_profile.grid(row=0, column=2)
+        self.profile_combobox=ttk.Combobox(self.bot_panel, font='arial 10',
+            justify='center')
+        self.profile_items=get_profiles()
+        self.profile_combobox['values'] = self.profile_items
+        self.profile_combobox['state'] = 'readonly'
+        self.profile_combobox.current(0)
+        self.profile_combobox.grid(row=0, column=3)
+        self.profile_combobox.bind("<<ComboboxSelected>>", self.callback)
+        #submit
+        submit_button = Button(self.bot_panel, text='Старт', font='Times 14 bold',
+            command=lambda x:self.start(self.profile_combobox.get()))
+        submit_button.grid(row=1, column=0)
 
     def widgets_message_panel(self):
         self.entry_template = Text(self.message_panel,
@@ -64,6 +89,13 @@ class Application(object):
             text='Создать', command=self.get_messages,
             font='Times 14 bold').grid(row=4, column=0)
 
+    def callback(self, eventObject):
+        print(eventObject)
+        self.widgets_bot_panel(self.profile_combobox.get())
+
+
+    def start(self, profile_id):
+        print(profile_id)
 
     def get_messages(self):
         text = [row.replace('\n', '') for row in self.get_templates_selected()]
