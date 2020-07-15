@@ -11,9 +11,7 @@ ua = UserAgent()
 driver = webdriver.ChromeOptions()
 prefs = {"profile.managed_default_content_settings.images": 2}
 userAgent = ua.random
-print(userAgent)
 options.add_argument(f'user-agent={userAgent}')
-driver = webdriver.Chrome( executable_path='D:/develop/pypr/bot_messages_template/chromedriver',options=driver)
 
 
 # driver.add_experimental_option("prefs", prefs)
@@ -44,19 +42,23 @@ def login(username, password):
 
 
 def test():
+    driver = webdriver.Chrome( executable_path='D:/develop/pypr/bot_messages_template/chromedriver',options=driver)
+
     accounts = [
         ['zhelyaskova1M@gmail.com', '54321012'],
         ['2107miker@gmail.com', '2107miker'],
     ]
     for i in range(2):
-        # for j in range(2):
         driver.get('https://prime.date/auth')
         #     time.sleep(3)
+        while driver.current_url == 'https://prime.date/auth':
             driver.find_element_by_xpath("/html/body/div[1]/div[4]/div/form/div[2]/input").send_keys(accounts[i][0])
             driver.find_element_by_xpath("/html/body/div[1]/div[4]/div/form/div[3]/input").send_keys(accounts[i][1])
             driver.find_element_by_xpath('/html/body/div[1]/div[4]/div/form/button').click()
+            time.sleep(2)
 
-        driver.find_element_by_tag_name('html').send_keys(Keys.CONTROL + 't')
+        driver.find_element_by_tag_name('html').send_keys(Keys.LEFT_CONTROL + 't')
 
     # driver.close()
-test()
+# if __name__ == "__main__":
+#     test()

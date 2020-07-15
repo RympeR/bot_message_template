@@ -33,3 +33,6 @@ a1 + c2 + b - b
 c1 + b2 + c - c
 b1 + a2 + c - c
 b1 + c2 + a - a
+c1 + a2 + b - b
+b1 + a2 + b - b
+c1 + a2 + c - c

@@ -1,14 +1,17 @@
 from tkinter import *
-from tkinter import ttk
+from tkinter import ttk, messagebox, simpledialog
 from template_logic import *
-from bot_logic import *
+from bot_logic import get_profiles
+from template_window import *
 import json
 
 MESSAGES = {}
+PROFILES = []
 
 class Application(object):
-    def __init__(self, master):
+    tabs_arr = []
 
+    def __init__(self, master):
         self.master = master
         self.message_template = StringVar()
         self.main_window()
@@ -17,12 +20,11 @@ class Application(object):
         self.tabs = ttk.Notebook(self.master)
         self.tabs.pack(fill=BOTH, expand=True)
         self.bot_panel = ttk.Frame(self.tabs)
-        self.message_panel = ttk.Frame(self.tabs)
+
         self.tabs.add(self.bot_panel, text="Bot panel")
-        self.tabs.add(self.message_panel, text="Message panel")
-        self.widgets_message_panel()
-        self.display_templates()
+
         self.widgets_bot_panel()
+        self.menu()
 
     def widgets_bot_panel(self, profile_id=None):
         #рассылка
@@ -48,92 +50,48 @@ class Application(object):
             command=lambda x:self.start(self.profile_combobox.get()))
         submit_button.grid(row=1, column=0)
 
-    def widgets_message_panel(self):
-        self.entry_template = Text(self.message_panel,
-            font='Times 14', width=60, height=7)
-        self.entry_template.grid(row=0, column=0, pady=20)
-
-        scroll = Scrollbar(self.message_panel, command=self.entry_template.yview)
-        scroll.grid(row=0, column=1, sticky=W)
-        self.entry_template.config(yscrollcommand=scroll.set)
-
-        add_message_butn = Button(self.message_panel, text='Добавить шаблон',
-            font='Times 12 bold',
-             command=self.add_template).grid(row=0, column=2, pady=(0, 20))
-
-        self.lbl_template = Label(self.message_panel, text='Текущие шаблоны',
-            font='arial 15 bold')
-        self.lbl_template.grid(row=1, column=0)
-
-        self.templates_listbox = Listbox(self.message_panel,
-            height=15, width=60, font='Time 14', selectmode=MULTIPLE)
-        self.templates_listbox.grid(row=1, column=2)
-
-        self.lbl_result = Label(self.message_panel,
-            text='Готовые рассылки', font='arial 15 bold')
-        self.lbl_result.grid(row=2, column=0, pady=(20, 20))
-
-        self.result_template = Text(self.message_panel, width=60, height=10)
-        self.result_template.grid(row=2, column=1, columnspan=2, pady=(20, 20))
-
-        self.lbl_amount_vars = Label(self.message_panel, text='Колличество',
-            font='arial 15 bold')
-        self.lbl_amount_vars.grid(row=3, column=0, pady=(20, 20))
-
-        self.amount_vars= StringVar(self.master,'10')
-        self.variants_amount = Spinbox(self.message_panel, from_=0,to=1000,
-            wrap=True,textvariable=self.amount_vars,width=4)
-        self.variants_amount.grid(row=3, column=1, pady=(20, 20))
-
-        submit_button = Button(self.message_panel,
-            text='Создать', command=self.get_messages,
-            font='Times 14 bold').grid(row=4, column=0)
-
     def callback(self, eventObject):
         print(eventObject)
         self.widgets_bot_panel(self.profile_combobox.get())
 
 
-    def start(self, profile_id):
-        print(profile_id)
+    def template_window(self):
+        template_form = TemplateForm()
 
-    def get_messages(self):
-        text = [row.replace('\n', '') for row in self.get_templates_selected()]
-        print(text)
-        amount = int(self.amount_vars.get())
-        self.result_template.delete(1.0, END)
-        self.result_template.insert(1.0, "\n".join(create_message(amount, text)))
+    def menu(self):
+        self.menuBar = Menu(self.master)
+        self.master.config(menu=self.menuBar)
+        self.file = Menu(self.menuBar, tearoff=0)
+        self.menuBar.add_cascade(label='Template', menu=self.file)
+        self.file.add_command(label='template window',
+            command=self.template_window)
+        self.add_ = Menu(self.menuBar, tearoff=0)
+        self.menuBar.add_cascade(label='Tabs', menu=self.add_)
+        self.add_.add_command(label='Add tab',
+            command=self.add_tab)
 
+    def add_tab(self):
+        login = simpledialog.askstring(
+                "Login", "Input login", parent=self.master)
+        password = simpledialog.askstring(
+                "Password", "Input password", parent=self.master)
+        self.tabs_arr.append(ttk.Frame(self.tabs))
 
-    def clear_templates(self):
-        self.templates_listbox.delete(0, END)
+        PROFILES.append({'login' : login,
+                        'password': password,
+                        'index': len(self.tabs_arr)})
 
-    def add_template(self):
-        with open('templates.txt', 'a', encoding='utf-8') as f:
-            f.write(self.entry_template.get(1.0, END))
-        self.display_templates()
-
-
-    def display_templates(self):
-        self.clear_templates()
-        with open('templates.txt', 'r', encoding='utf-8') as f:
-            text = f.readlines()
-            for row in text:
-                self.templates_listbox.insert(END, row)
-
-
-    def get_templates_selected(self):
-        UsrFCList = []
-        selctd_indices = self.templates_listbox.curselection()
-        lst_select = list(selctd_indices)
-        for i in lst_select:
-            UsrFCList.append(self.templates_listbox.get(i))
-        return UsrFCList
+        self.tabs.add(self.tabs_arr[-1],
+            text=f"Login {PROFILES[len(self.tabs_arr) - 1]['login']}")
+        Label(self.tabs_arr[-1],
+            text=f"Login {PROFILES[len(self.tabs_arr) - 1]['login']}\n" + \
+            f"Password {PROFILES[len(self.tabs_arr) - 1]['password']}",
+             font='Arial 14 bold').grid(row=0, column=0)
 
 def main():
     root = Tk()
     app = Application(root)
-    root.title("Child center")
+    root.title("Template window")
     root.geometry("1100x900")
 
     root.mainloop()
