@@ -23,6 +23,7 @@ def get_profiles():
         text = [row.replace('\n', '') for row in text]
     return text
 
+
 def send_icebreaker(id_profile, message):
     pass
 
@@ -35,13 +36,19 @@ def reply(id_profile, id_chat, message):
 def notify(id_profile):
     pass
 
+def get_user_id():
+    return ''
+
+def logout():
+    return True
 
 def login(username, password):
-    id_profile = int()
+    id_profile = 1
     return id_profile
 
 
 def test():
+    global driver
     driver = webdriver.Chrome( executable_path='D:/develop/pypr/bot_messages_template/chromedriver',options=driver)
 
     accounts = [
@@ -60,5 +67,5 @@ def test():
         driver.find_element_by_tag_name('html').send_keys(Keys.LEFT_CONTROL + 't')
 
     # driver.close()
-# if __name__ == "__main__":
-#     test()
+if __name__ == "__main__":
+    test()
