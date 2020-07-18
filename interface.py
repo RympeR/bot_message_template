@@ -1,11 +1,16 @@
-from tkinter import *
-from tkinter import ttk, messagebox, simpledialog
-from template_logic import *
-from threading import Timer
-from bot_logic import get_profiles, get_user_id, logout
-from template_window import *
 import json
+from bot_logic import get_profiles
+from bot_logic import get_user_id
+from bot_logic import logout, login, get_offline
+from template_logic import *
+from template_window import *
+from threading import Timer
+from tkinter import *
+from tkinter import messagebox
+from tkinter import simpledialog
+from tkinter import ttk
 from ttkthemes import themed_tk as tk
+from multiprocessing.pool import ThreadPool
 
 
 MESSAGES = {}
@@ -28,7 +33,8 @@ class Application(object):
         self.main_window()
 
     def timeout(self, index):
-        self.begin_work_buttons_arr[index].config(bg='black')
+        logout()
+        self.begin_work_buttons_arr[index].config(bg='Blue')
 
     def main_window(self):
         self.tabs = ttk.Notebook(self.master)
@@ -37,44 +43,7 @@ class Application(object):
 
         self.tabs.add(self.bot_panel, text="Bot panel")
 
-        # self.widgets_bot_panel()
         self.menu()
-
-    def widgets_bot_panel(self, profile_id=None):
-        #рассылка
-        self.lbl_message = Label(self.bot_panel, text='Рассылка', font='arial 15 bold')
-        self.lbl_message.grid(row=0, column=0, pady=10)
-        self.entry_message = Entry(self.bot_panel, width=30, bd=4)
-        self.entry_message.grid(row=0, column=1, padx=10, pady=10)
-
-        #анкета
-        self.lbl_profile = Label(
-                            self.bot_panel,
-                            text=f'Текущий профиль {profile_id}',
-                            font='arial 15 bold'
-                            )
-        self.lbl_profile.grid(row=0, column=2)
-
-        self.profile_combobox=ttk.Combobox(
-                                            self.bot_panel,\
-                                            font='arial 10',
-                                            justify='center'
-                                )
-        self.profile_items=get_profiles()
-        self.profile_combobox['values'] = self.profile_items
-        self.profile_combobox['state'] = 'readonly'
-        self.profile_combobox.current(0)
-        self.profile_combobox.grid(row=0, column=3)
-        self.profile_combobox.bind("<<ComboboxSelected>>", self.callback)
-        #submit
-        submit_button = Button(self.bot_panel, text='Старт', font='Times 14 bold',
-            command=lambda x:self.start(self.profile_combobox.get()))
-        submit_button.grid(row=1, column=0)
-
-    def callback(self, eventObject):
-        print(eventObject)
-        self.widgets_bot_panel(self.profile_combobox.get())
-
 
     def template_window(self):
         template_form = TemplateForm()
@@ -94,6 +63,7 @@ class Application(object):
 
 
     def start_message(self, login, password, message):
+        curr_index = self.tabs.index(self.tabs.select())-1
 
         self.amount_messages_arr[curr_index] += 1
 
@@ -110,14 +80,24 @@ class Application(object):
 
 
     def begin_work(self):
+        
         curr_index = self.tabs.index(self.tabs.select())-1
-        id_profile = login(
-                            PROFILES[curr_index]['login'],
-                            PROFILES[curr_index]['password']
-                        )
-        PROFILES[curr_index]['user_id'] = id_profile
-
-        self.begin_work_buttons_arr[index].config(bg='Yellow')
+        
+        authorized = PROFILES[curr_index].get('logined', False)
+        if not authorized:
+            id_profile, logined = login(
+                                PROFILES[curr_index]['login'],
+                                PROFILES[curr_index]['password']
+                            )
+            PROFILES[curr_index]['user_id'] = id_profile
+            PROFILES[curr_index]['logined'] = logined
+        else:
+            get_offline(
+                        PROFILES[curr_index]['login'],
+                        PROFILES[curr_index]['password']
+                )
+        print(PROFILES)
+        self.begin_work_buttons_arr[curr_index].config(bg='Yellow')
         self.times_arr[curr_index] = Timer(10,
             lambda :self.timeout(curr_index)).start()
 
@@ -195,7 +175,7 @@ class Application(object):
                                         self.tabs_arr[-1],
                                         text='Анкета оффлайн',
                                         command=self.begin_work,
-                                        bg='Black'
+                                        bg='Blue'
                                         )
                                     )
         self.begin_work_buttons_arr[-1].grid(row=2, column=1)
