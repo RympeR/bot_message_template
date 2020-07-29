@@ -1,52 +1,46 @@
-c + c1
-a + c1
-a + b1
-c + a1
-b + a1
-a1 - b2
-c1 - b2
 a1 - a2
-b1 - c2
-c1 - a2
-b1 - b2
 b1 - a2
 c1 - c2
-a1 - c2
-a-a2
-a-c2
-b-b2
-c-a2
-b-a2
-c1 + c2 + c - c
-a1 + b2 + b - b
-a1 + c2 + c - c
-c1 + a2 + a - a
-b1 + a2 + a - a
-a1 + c2 + a - a
-b1 + c2 + b - b
-b1 + b2 + a - a
-b1 + b2 + b - b
-a1 + a2 + b - b
-c1 + c2 + a - a
-a1 + a2 + a - a
-a1 + c2 + b - b
-c1 + b2 + c - c
-b1 + a2 + c - c
-b1 + c2 + a - a
-c1 + a2 + b - b
-b1 + a2 + b - b
-c1 + a2 + c - c
-b1 + b2 + c - c
-c1 + b2 + a - a
-c1 + c2 + b - b
-c1 + b2 + b - b
-b-c2
-c-b2
-a-b2
-c-c2
-b + c1 + c2
-a + a1 + a2
+a1 - b2
+c1 - b2
+c1 - a2
+Привет С‚С‹ как С‚С‹
+Привет С‚С‹ как РїРѕРіРѕРґР°
+Привет РјРёР»С‹Р№ как С‚РІРѕРё РґРµР»Р°
+Привет С‚С‹ как С‚РІРѕРё РґРµР»Р°
+Привет СЏ как С‚С‹
+Привет РјРёР»С‹Р№ как РїРѕРіРѕРґР°
+Привет СЏ как С‚РІРѕРё РґРµР»Р°
+Привет СЏ как РїРѕРіРѕРґР°
+Привет РјРёР»С‹Р№ как С‚С‹
+Привет i как are you
+Привет sweet как are you
+Привет you как you
+Привет sweet как weather
+Привет you как are you
+b1 - c2
+b1 - b2
+Привет i как you
+Привет i как weather
+c + a1 + c2
 c + b1 + b2
-a1 + a2 + c - c
-a1 + b2 + c - c
-a1 + b2 + a - a
+a1 + c2 + c - c
+b1 + a2 + a - a
+Привет sweet как you
+Привет you как weather
+c + a1
+a1 - c2
+b-b2
+a + a1 + b2
+b1 + b2 + a - a
+c + b1
+a-b2
+c + a1 + b2
+a1 + a2 + a - a
+Привет you как you
+b + c1
+c1 - c2
+c-c2
+c + b1 + c2
+c1 + b2 + a - a
+Привет sweet как you

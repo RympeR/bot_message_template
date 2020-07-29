@@ -85,12 +85,12 @@ class Application(object):
         
         authorized = PROFILES[curr_index].get('logined', False)
         if not authorized:
-            id_profile, logined = login(
+            login(
                                 PROFILES[curr_index]['login'],
                                 PROFILES[curr_index]['password']
                             )
-            PROFILES[curr_index]['user_id'] = id_profile
-            PROFILES[curr_index]['logined'] = logined
+            # PROFILES[curr_index]['user_id'] = id_profile
+            # PROFILES[curr_index]['logined'] = logined
         else:
             get_offline(
                         PROFILES[curr_index]['login'],
