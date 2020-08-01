@@ -1,17 +1,14 @@
 import json
-from bot_logic import get_profiles
-from bot_logic import get_user_id
-from bot_logic import logout, login, get_offline
-from template_logic import *
-from template_window import *
+from multiprocessing.pool import ThreadPool
 from threading import Timer
 from tkinter import *
-from tkinter import messagebox
-from tkinter import simpledialog
-from tkinter import ttk
-from ttkthemes import themed_tk as tk
-from multiprocessing.pool import ThreadPool
+from tkinter import messagebox, simpledialog, ttk
 
+from ttkthemes import themed_tk as tk
+
+from bot_logic import get_offline, get_profiles, get_user_id, login, logout
+from template_logic import *
+from template_window import *
 
 MESSAGES = {}
 PROFILES = []
