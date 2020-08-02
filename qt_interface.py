@@ -1,18 +1,10 @@
-from bot_logic import DriverLogic
-from PySide2 import QtCore, QtGui, QtWidgets
-from PySide2.QtCore import *
+# from bot_logic import DriverLogic
 import sys
 
-from PySide2.QtWidgets import *
-
+from PySide2 import QtCore, QtGui, QtWidgets
+from PySide2.QtCore import *
 from PySide2.QtGui import *
-
-# from bot_logic import *
-
-
-MESSAGES = {}
-PROFILES = {}
-
+from PySide2.QtWidgets import *
 
 MESSAGES = {}
 PROFILES = {}
@@ -113,7 +105,7 @@ class Window(QMainWindow):
         self.mainLayout = QVBoxLayout()
         self.menu()
         self.main_tab()
-        
+
         self.setLayout(self.mainLayout)
         self.show()
 
@@ -121,68 +113,76 @@ class Window(QMainWindow):
         menubar = self.menuBar()
         template = menubar.addMenu("Шаблоны")
         enter = menubar.addMenu("Вход")
-        login = QAction("&Log in", self)
-        login.setShortcut("Ctrl+L")
-        login.triggered.connect(self.login_form)
         add_template = QAction("&Template", self)
         add_template.setShortcut("Ctrl+T")
         add_template.triggered.connect(self.template_window)
-        enter.addAction(login)
         template.addAction(add_template)
 
     def main_tab(self):
+        ###################QTGUI######################
+        font = QFont()
+        font.setFamily("Bahnschrift Light")
+        font.setPointSize(12)
+
+        ##############ENTRY FIELDS####################
         self.login = QtWidgets.QLineEdit(self)
         self.login.setGeometry(QRect(420, 130, 171, 22))
         self.login.setObjectName("login")
         self.login.setPlaceholderText("Login")
+
         self.password = QtWidgets.QLineEdit(self)
         self.password.setGeometry(QRect(420, 240, 171, 22))
         self.password.setObjectName("password")
         self.password.setPlaceholderText("Password")
+        ######################LABELS######################
         self.login_label = QLabel("Логин", self)
         self.login_label.setGeometry(QRect(470, 80, 71, 31))
-        font = QFont()
-        font.setFamily("Bahnschrift Light")
-        font.setPointSize(12)
         self.login_label.setFont(font)
         self.login_label.setObjectName("login_label")
+
         self.pass_label = QLabel("Пароль", self)
         self.pass_label.setGeometry(QRect(460, 200, 91, 21))
         self.pass_label.setFont(font)
         self.pass_label.setObjectName("pass_label")
+
+        ##################BTNS################################
         self.enter_btn = QPushButton("Войти", self)
         self.enter_btn.setGeometry(QRect(460, 300, 111, 41))
         self.enter_btn.setObjectName("enter_btn")
         self.enter_btn.clicked.connect(self.login_form)
 
-    def create_tab(self, id_profile):
+    def create_tab(self, profile_info: dict):
         font = QtGui.QFont()
         font.setFamily("Bahnschrift Light")
         font.setPointSize(12)
 
         # self.thread_arr.append(MessageThread('driver'))
-
+        #left top width height
         ##################tabs####################
         self.tabs_arr.append(QtWidgets.QWidget())
         self.tabs_arr[-1].setObjectName("tab")
-        self.tabs.addTab(self.tabs_arr[-1], str(id_profile))
+        self.tabs.addTab(self.tabs_arr[-1], str(profile_info['id']))
         self.setCentralWidget(self.tabs)
 
         ###############Label id##########################
         self.labels_id_arr.append(QtWidgets.QLabel(
-            str(id_profile), self.tabs_arr[-1]))
-        self.labels_id_arr[-1].setGeometry(QtCore.QRect(20, 10, 101, 51))
+            str(profile_info['id']) + '\n' +
+            profile_info['name'] + '\n' + str(profile_info['age']),
+            self.tabs_arr[-1]))
+        self.labels_id_arr[-1].setGeometry(QtCore.QRect(20, 10, 151, 101))
         self.labels_id_arr[-1].setFont(font)
         self.labels_id_arr[-1].setObjectName("id_profile")
 
         ############Online btn##########################
         self.online_buttons_arr.append(
             QtWidgets.QPushButton("Онлайн", self.tabs_arr[-1]))
-        self.online_buttons_arr[-1].setGeometry(QtCore.QRect(20, 70, 93, 28))
+        self.online_buttons_arr[-1].setGeometry(QtCore.QRect(181, 30, 93, 28))
         self.online_buttons_arr[-1].setStyleSheet("#online{\n"
                                                   "background-color: green;\n"
                                                   "}")
         self.online_buttons_arr[-1].setObjectName("online")
+        self.online_buttons_arr[-1].clicked.connect(
+            lambda x:self.online_profile(profile_info['id']))
 
         ##################Message entry field###############
         self.entry_message_arr.append(QtWidgets.QLineEdit(self.tabs_arr[-1]))
@@ -202,7 +202,9 @@ class Window(QMainWindow):
                                                          "background-color: green;\n"
                                                          "}")
         self.begin_message_buttons_arr[-1].setObjectName("start_message")
-
+        self.begin_message_buttons_arr[-1].clicked.connect(
+            lambda x: self.send_message(profile_info)
+        )
         ###################Stop mesage btn################
         self.stop_message_buttons_arr.append(
             QtWidgets.QPushButton("Стоп", self.tabs_arr[-1]))
@@ -221,6 +223,9 @@ class Window(QMainWindow):
                                                  "background-color:yellow;\n"
                                                  "}")
         self.moder_ice_btn_arr[-1].setObjectName("moderation")
+        self.moder_ice_btn_arr[-1].clicked.connect(
+            lambda x: self.send_to_moder(profile_info['id'])
+            )
 
         ###############Reset curr ice from send btn#############
         self.reset_curr_ice_btn_arr.append(
@@ -231,6 +236,7 @@ class Window(QMainWindow):
                                                       "background-color:red;\n"
                                                       "}")
         self.reset_curr_ice_btn_arr[-1].setObjectName("stop_ice")
+        self.reset_curr_ice_btn_arr[-1].clicked.connect(self.reset_ice)
 
         ###############Send new ice btn#############
         self.new_ice_btn_arr.append(
@@ -240,6 +246,9 @@ class Window(QMainWindow):
                                                "background-color:green;\n"
                                                "}")
         self.new_ice_btn_arr[-1].setObjectName("send_ice")
+        self.new_ice_btn_arr[-1].clicked.connect(
+            lambda x: self.send_ice(profile_info['id'])
+            )
 
         ###############IceBreaker entry field#############
         self.entry_ice_arr.append(QtWidgets.QLineEdit(self.tabs_arr[-1]))
@@ -265,92 +274,60 @@ class Window(QMainWindow):
         self.labels_ice_arr[-1].setFont(font)
         self.labels_ice_arr[-1].setObjectName("iceBreaker_lbl")
 
-    def login_form(self):
-        self.tabs = QTabWidget()
-        self.tabs.setGeometry(QRect(0, 0, 1061, 421))
-        self.tabs.setStyleSheet("QWidget{\n"
-                                "    background-color: rgb(192, 211, 210);\n"
-                                "}")
-        self.tabs.move(0, 20)
-        self.setCentralWidget(self.tabs)
-        self.tabs_arr.clear()
-        ''' logic from bot_logic '''
-        for i in range(2):
-            self.create_tab(i)
-        self.mainLayout.addWidget(self.tabs)
-        self.show()
-        self.mainLayout.addWidget(self.tabs)
+    def send_to_moder(self, id_profile):
+        ice = self.entry_ice_arr[self.tabs.currentIndex()].text()
+        print(str(id_profile) + ice)
 
-    def template_window(self):
-        print('templates')
+    def send_ice(self, id_profile):
+        print(id_profile)
 
+    def send_message(self, id_profile):
+        curr_message = self.entry_message_arr[self.tabs.currentIndex()].text()
+        print(str(id_profile) + curr_message)
 
-def main():
-    app = QApplication(sys.argv)
-    window = Window()
-    sys.exit(app.exec_())
+    def stop_message(self, id_profile):
+        ''' QThread logic '''
+        pass
+    def reset_ice(self, id_profile):
+        print(id_profile)
 
-
-if __name__ == "__main__":
-    main()
-
-
-class Window(QMainWindow):
-    tabs_arr = []
-    online_buttons_arr = []
-    online_labels_arr = []
-    begin_message_buttons_arr = []
-    stop_message_buttons_arr = []
-    entry_message_arr = []
-
-    def __init__(self):
-        super().__init__()
-        self.setGeometry(50, 50, 500, 750)
-        self.setWindowTitle("ПраймБот")
-        self.ui()
-
-    def ui(self):
-        self.mainLayout = QVBoxLayout()
-        self.menu()
-        self.main_tab()
-        self.mainLayout.addWidget(self.tabs)
-        self.setLayout(self.mainLayout)
-        self.show()
-
-    def menu(self):
-        menubar = self.menuBar()
-        template = menubar.addMenu("Шаблоны")
-        enter = menubar.addMenu("Вход")
-        login = QAction("&Log in", self)
-        login.setShortcut("Ctrl+L")
-        login.triggered.connect(self.login_form)
-        add_template = QAction("&Template", self)
-        add_template.setShortcut("Ctrl+T")
-        add_template.triggered.connect(self.template_window)
-        enter.addAction(login)
-        template.addAction(add_template)
-
-    def main_tab(self):
-        self.tabs = QTabWidget()
-        self.tabs.resize(500, 730)
-        self.tabs.move(0, 20)
-        self.setCentralWidget(self.tabs)
-
-    def create_tab(self, id_profile):
-        self.tabs_arr.append(QWidget())
-        self.online_buttons_arr.append(
-            QPushButton("Оффлайн", self.tabs_arr[-1]))
-        self.online_buttons_arr[-1].move(100, 100)
-        self.tabs.addTab(self.tabs_arr[-1], str(id_profile))
-        print(self.tabs.currentIndex())
+    def online_profile(self, id_profile):
+        print(id_profile)
 
     def login_form(self):
-        self.tabs_arr.clear()
-        ''' logic from bot_logic '''
-        for i in range(2):
-            self.create_tab(i)
-        self.mainLayout.addWidget(self.tabs)
-        self.show()
+        global PROFILES
+        PROFILES['login'] = self.login.text()
+        PROFILES['password'] = self.password.text()
+        PROFILES['info'] = []
+
+        if PROFILES['login'] == '1' and PROFILES['password'] == '1':
+            self.tabs = QTabWidget()
+            self.tabs.setGeometry(QRect(0, 0, 1061, 421))
+            self.tabs.setStyleSheet("QWidget{\n"
+                                    "    background-color: rgb(192, 211, 210);\n"
+                                    "}")
+            self.tabs.move(0, 20)
+            self.setCentralWidget(self.tabs)
+            self.tabs_arr.clear()
+            ''' logic from bot_logic '''
+            profiles_info = [
+                {
+                    'id': 12312341234,
+                    'name': 'Olga',
+                    'age': 55
+                },
+                {
+                    'id': 12341234234,
+                    'name': 'Anya',
+                    'age': 32
+                }
+            ]
+            for i in range(len(profiles_info)):
+                PROFILES['info'].append(profiles_info[i])
+                self.create_tab(profiles_info[i])
+            self.mainLayout.addWidget(self.tabs)
+            self.show()
+            self.mainLayout.addWidget(self.tabs)
 
     def template_window(self):
         print('templates')

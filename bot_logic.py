@@ -3,7 +3,9 @@ import random
 import re
 import time
 from random import randint
+import requests
 
+from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
@@ -22,96 +24,185 @@ class DriverLogic:
         # driver.add_experimental_option("prefs", prefs)
         # driver.add_argument("headless")
 
+    def get_html(self, url):
+        response = requests.get(url)
+        return response.text
+
+    def get_bs_object(self, hmtl):
+        bs = BeautifulSoup(hmtl, parser='html.parser')
+        return bs
+
     def get_profiles(self):
         with open('profiles.txt') as f:
             text = f.readlines()
             text = [row.replace('\n', '') for row in text]
         return text
 
+    def getladynameandage(self, id_profile):
+        global driver
+        # save name and age
+        driver.get(f"https://prime.date/profile-woman/{id_profile}")
+        ladynameandage = driver.find_element_by_xpath(
+            "/html/body/div[1]/section/div/div/div[1]/div[2]/div[1]/div[2]/div[1]").text
+        print(ladynameandage)
+        return ladynameandage
+
     def send_icebreaker_to_moderation(self, id_profile, message):
         global driver
+        ladynameandage = getladynameandage(id_profile)
         driver.get('https://prime.date/icebreakers')
-        # icebrakerssend to moderation GO
         driver.find_element_by_xpath(
-            '/html/body/div[1]/section/div/div[1]/div/div/div/div[2]/button[1]')
+            '/html/body/div[1]/section/div/div[1]/div/div/div/div[2]/button[1]')  # GO TO send to moderation
         driver.find_element_by_xpath(
             '/html/body/div[1]/section/div/div[2]/div/main/div/div/div[2]/div[1]/div[1]/div/div/div[1]').click()  # открыть список
-        driver.find_element_by_xpath(
-            '/html/body/div[1]/section/div/div[2]/div/main/div/div/div[2]/div[2]/div/textarea').send_keys(message)
-        # driver.find_element_by_xpath('/html/body/div[1]/section/div/div[2]/div/main/div/div/div[2]/div[3]/div/button').click()
+        b = 1
+        while (True):
+            try:
+                if driver.find_element_by_xpath(
+                        f"/html/body/div[1]/section/div/div[2]/div/main/div/div/div[2]/div[1]/div[1]/div/div/div[3]/ul/li[{b}]/span/span").text == ladynameandage:
+                    driver.find_element_by_xpath(
+                        f"/html/body/div[1]/section/div/div[2]/div/main/div/div/div[2]/div[1]/div[1]/div/div/div[3]/ul/li[{b}]/span").click()  # click to choose lady
+                    print(b)
+                    driver.find_element_by_xpath(
+                        '/html/body/div[1]/section/div/div[2]/div/main/div/div/div[2]/div[2]/div/textarea').send_keys(
+                        message)
+                    # driver.find_element_by_xpath('/html/body/div[1]/section/div/div[2]/div/main/div/div/div[2]/div[3]/div/button').click()
+                    return True
+                    break
+                b = b + 1
+            except NoSuchElementException:
+                break
+                return False
 
     def send_icebreaker(self, id_profile):
         global driver
+        ladynameandage = getladynameandage(id_profile)
         driver.get('https://prime.date/icebreakers')
         driver.find_element_by_xpath(
-            '/html/body/div[1]/section/div/div[1]/div/div/div/div[2]/button[3]').click()  # icebreakers in progress
+            '/html/body/div[1]/section/div/div[1]/div/div/div/div[2]/button[3]').click()  # GO TO icebreakers in progress
         time.sleep(randint(1, 3))
-        # driver.find_element_by_xpath('/html/body/div[1]/section/div/div[2]/div/main/div/table/tbody/tr[1]/td[5]/span[1]').click()#close icebraker
-        time.sleep(randint(1, 5))
-        driver.find_element_by_xpath(
-            '/html/body/div[1]/section/div/div[1]/div/div/div/div[2]/button[2]').click()  # send icebreakers
+        b = 1
+        while (True):
+            try:
+                if driver.find_element_by_xpath(
+                        f"/html/body/div[1]/section/div/div[2]/div/main/div/table/tbody/tr[{b}]/td[2]/p[2]").text == ladynameandage:
+                    # driver.find_element_by_xpath(f"/html/body/div[1]/section/div/div[2]/div/main/div/table/tbody/tr[{b}]/td[5]/span[1]").click()#click to close icebreaker
+                    print(b)
+                    break
+                b = b + 1
+            except NoSuchElementException:
+                break
         time.sleep(randint(1, 4))
-        # driver.find_element_by_xpath('/html/body/div[1]/section/div/div[2]/div/main/div/table/tbody/tr[1]/td[4]/div[1]/span[2]').click()#send first
-        time.sleep(1, 5)
+        driver.find_element_by_xpath(
+            '/html/body/div[1]/section/div/div[1]/div/div/div/div[2]/button[2]').click()  # GO TO send icebreakers
+        time.sleep(randint(1, 4))
+        b = 1
+        while (True):
+            try:
+                if driver.find_element_by_xpath(
+                        f"/html/body/div[1]/section/div/div[2]/div/main/div/table/tbody/tr[{b}]/td[2]/p[2]").text == ladynameandage:
+                    # driver.find_element_by_xpath(f"/html/body/div[1]/section/div/div[2]/div/main/div/table/tbody/tr[{b}]/td[4]/div[1]/span[2]").click()#click to send icebreaker
+                    print(b)
+                    break
+                    return True
+                b = b + 1
+            except NoSuchElementException:
+                break
+                return False
 
-    def send_chat_message(self, id_profile, message, counter):
+    def send_chat_message(self, id_profile, message):  # READY TO GO
         global driver
         manid = randint(40000000, 900000000)
         nexturl = 'https://prime.date/chat/' + id_profile + '_' + str(manid)
         driver.get(nexturl)
-        time.sleep(5)
+        time.sleep(2)
         blacklist = []  # чёрный список для уникальной рассылки
-        for i in range(1, counter):
-            try:
+        try:
+            driver.find_element_by_xpath(
+                '/html/body/div[1]/section/div/div/div[2]/div/div[2]/div[1]/div[1]/div[2]/p')
+            if (driver.find_element_by_xpath('/html/body/div[1]/section/div/div/div[2]/div/div[2]/div[1]/div[1]/div[2]/p').text == 'No activity from man. Message cannot be send.'):
+                return False  # отправка невозможна, сообщение не отправлено
+        except NoSuchElementException:
+            if(blacklist.index(manid) < 0):
+                blacklist.append(manid)
                 driver.find_element_by_xpath(
-                    '/html/body/div[1]/section/div/div/div[2]/div/div[2]/div[1]/div[1]/div[2]/p')
-                if (driver.find_element_by_xpath('/html/body/div[1]/section/div/div/div[2]/div/div[2]/div[1]/div[1]/div[2]/p').text == 'No activity from man. Message cannot be send.'):
-                    manid = manid + randint(1, 10)
-                    nexturl = 'https://prime.date/chat/' + \
-                        id_profile + '_' + str(manid)
-                    driver.get(nexturl)
-                    time.sleep(4)
-            except NoSuchElementException:
-                if(blacklist.index(manid) >= 0):
-                    blacklist.append(manid)
-                    driver.find_element_by_xpath(
-                        '/html/body/div[1]/section/div/div/div[2]/div/div[2]/div[1]/div[2]/div[1]/textarea').send_keys(message[i-1])
-                    # driver.find_element_by_xpath('/html/body/div[1]/section/div/div/div[2]/div/div[2]/div[1]/div[2]/div[2]/div[2]/button[2]').click()
+                    '/html/body/div[1]/section/div/div/div[2]/div/div[2]/div[1]/div[2]/div[1]/textarea').send_keys(message)
+                # driver.find_element_by_xpath('/html/body/div[1]/section/div/div/div[2]/div/div[2]/div[1]/div[2]/div[2]/div[2]/button[2]').click()
+                return True  # сообщение отправлено
+            else:
+                return False  # мы обосрались, этот мужик уже был
 
     def reply(self, id_profile, id_chat, message):
         pass
 
     def notify(self, id_profile):
-        pass
-
-    def answertounread(self, id_profile, message):  # отвечает на первое неотвеченное сообщение
+        global driver
+        ladynameandage = getladynameandage(id_profile)
         driver.get('https://prime.date/chat/:uid')
-        time.sleep(2)
         driver.find_element_by_xpath(
-            '/html/body/div[1]/section/div/div/div[1]/div[1]/div/div[1]/div/button[2]').click()
-        time.sleep(3)
+            "/html/body/div[1]/section/div/div/div[1]/div[1]/div/div[2]/div/label/span[1]").click()  # men online
+        driver.find_element_by_xpath(
+            '/html/body/div[1]/section/div/div/div[1]/div[1]/div/div[1]/div/button[2]').click()  # unanswered
         b = 1
-        while(True):
+        while (True):
             try:
-                driver.find_element_by_xpath(
-                    f"/html/body/div[1]/section/div/div/div[2]/div/div[2]/div[1]/div[1]/div[1]/div/div{b}/div[1]/div[1]/p")
+                if driver.find_element_by_xpath(
+                        f"/html/body/div[1]/section/div/div/div[1]/div[1]/div/div[4]/div/div[1]/div[{b}]/div").text == ladynameandage:
+                    driver.find_element_by_xpath(
+                        f"/html/body/div[1]/section/div/div/div[1]/div[1]/div/div[4]/div/div[1]/div[{b}]/div").click()
+                    print(b)
+                    break
                 b = b + 1
             except NoSuchElementException:
                 break
+        try:  # /html/body/div[1]/section/div/div/div[1]/div[2]/div[2]/div/div/div[1]/div[10]/div/div/div[3]
+            if (driver.find_element_by_xpath(
+                    "/html/body/div[1]/section/div/div/div[1]/div[2]/div[2]/div/div[1]/div").get_attribute(
+                    "class") != "empty-state-list"):
+                print(
+                    f"{id_profile}, {ladynameandage} has unanswered messages in chats!")
+        except:
+            pass
+
+    # отвечает на первое неотвеченное сообщение
+    def answertounread(self, id_profile, message):
+        global driver
+        ladynameandage = getladynameandage(id_profile)
+        driver.get('https://prime.date/chat/:uid')
+        time.sleep(2)
         driver.find_element_by_xpath(
-            '/html/body/div[1]/section/div/div/div[1]/div[2]/div[2]/div/div/div[1]/div[1]/div/div').click()
-        if(driver.find_element_by_xpath(f"/html/body/div[1]/section/div/div/div[2]/div/div[2]/div[1]/div[1]/div[1]/div/div{b}/div[1]/div[1]/p").get_attribute('class') != 'message-text-like'):
+            '/html/body/div[1]/section/div/div/div[1]/div[1]/div/div[1]/div/button[2]').click()  # unanswered
+        b = 1
+        while (True):
+            try:
+                if driver.find_element_by_xpath(
+                        f"/html/body/div[1]/section/div/div/div[1]/div[1]/div/div[4]/div/div[1]/div[{b}]/div").text == ladynameandage:
+                    driver.find_element_by_xpath(
+                        f"/html/body/div[1]/section/div/div/div[1]/div[1]/div/div[4]/div/div[1]/div[{b}]/div").click()
+                    print(b)
+                    break
+                b = b + 1
+            except NoSuchElementException:
+                break
+                return False
+        time.sleep(2)
+        try:
             driver.find_element_by_xpath(
-                '/html/body/div[1]/section/div/div/div[2]/div/div[2]/div[1]/div[2]/div[1]/textarea').send_keys(message)
-            time.sleep(2)
-            # driver.find_element_by_xpath('/html/body/div[1]/section/div/div/div[2]/div/div[2]/div[1]/div[2]/div[2]/div[2]/button[2]').click()
+                '/html/body/div[1]/section/div/div/div[1]/div[2]/div[2]/div/div/div[1]/div[1]/div/div').click()
+        except NoSuchElementException:
+            return False
+        driver.find_element_by_xpath(
+            '/html/body/div[1]/section/div/div/div[2]/div/div[2]/div[1]/div[2]/div[1]/textarea').send_keys(message)
+        time.sleep(1)
+        # driver.find_element_by_xpath('/html/body/div[1]/section/div/div/div[2]/div/div[2]/div[1]/div[2]/div[2]/div[2]/button[2]').click()
+        return True
 
     def alert_by_new_message(self):
         pass
 
     def login(self, accounts):
         global driver
-        #     time.sleep(3)
+        # time.sleep(3)
         user_id = []
 
         driver.execute_script("window.open('https://prime.date/auth')")
@@ -192,6 +283,7 @@ class DriverLogic:
 
             driver.find_element_by_tag_name(
                 'html').send_keys(Keys.LEFT_CONTROL + 't')
+
 
     # driver.close()
 if __name__ == "__main__":

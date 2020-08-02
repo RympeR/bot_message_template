@@ -112,14 +112,9 @@ class Window(QMainWindow):
     def menu(self):
         menubar = self.menuBar()
         template = menubar.addMenu("Шаблоны")
-        enter = menubar.addMenu("Вход")
-        login = QAction("&Log in", self)
-        login.setShortcut("Ctrl+L")
-        login.triggered.connect(self.login_form)
         add_template = QAction("&Template", self)
         add_template.setShortcut("Ctrl+T")
         add_template.triggered.connect(self.template_window)
-        enter.addAction(login)
         template.addAction(add_template)
 
     def main_tab(self):
