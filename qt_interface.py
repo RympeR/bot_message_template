@@ -203,7 +203,7 @@ class Window(QMainWindow):
                                                          "}")
         self.begin_message_buttons_arr[-1].setObjectName("start_message")
         self.begin_message_buttons_arr[-1].clicked.connect(
-            lambda x: self.send_message(profile_info)
+            lambda x: self.send_message(profile_info['id'])
         )
         ###################Stop mesage btn################
         self.stop_message_buttons_arr.append(
@@ -214,6 +214,10 @@ class Window(QMainWindow):
                                                         "background-color: red;\n"
                                                         "}")
         self.stop_message_buttons_arr[-1].setObjectName("stop_message")
+        self.stop_message_buttons_arr[-1].clicked.connect(
+            lambda x: self.stop_message(profile_info['id'])
+        )
+
 
         ###############Send to moderation btn#############
         self.moder_ice_btn_arr.append(
@@ -288,6 +292,7 @@ class Window(QMainWindow):
     def stop_message(self, id_profile):
         ''' QThread logic '''
         pass
+
     def reset_ice(self, id_profile):
         print(id_profile)
 
